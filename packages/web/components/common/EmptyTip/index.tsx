@@ -10,10 +10,10 @@ type Props = FlexProps & {
 const EmptyTip = ({ text, ...props }: Props) => {
   const { t } = useTranslation();
   return (
-    <Flex mt={5} flexDirection={'column'} alignItems={'center'} pt={'10vh'} {...props}>
+    <Flex mt={5} flexDirection={'column'} alignItems={'center'} py={'10vh'} {...props}>
       <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-      <Box mt={2} color={'myGray.500'}>
-        {text || t('common.empty.Common Tip')}
+      <Box mt={2} color={'myGray.500'} fontSize={'sm'}>
+        {text || t('common:common.empty.Common Tip')}
       </Box>
     </Flex>
   );

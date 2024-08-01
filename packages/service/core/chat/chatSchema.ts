@@ -1,5 +1,5 @@
-import { connectionMongo, type Model } from '../../common/mongo';
-const { Schema, model, models } = connectionMongo;
+import { connectionMongo, getMongoModel } from '../../common/mongo';
+const { Schema } = connectionMongo;
 import { ChatSchema as ChatType } from '@fastgpt/global/core/chat/type.d';
 import { ChatSourceMap } from '@fastgpt/global/core/chat/constants';
 import {
@@ -61,7 +61,15 @@ const ChatSchema = new Schema({
   outLinkUid: {
     type: String
   },
+
+  variableList: {
+    type: Array
+  },
+  welcomeText: {
+    type: String
+  },
   variables: {
+    // variable value
     type: Object,
     default: {}
   },
@@ -90,6 +98,4 @@ try {
   console.log(error);
 }
 
-export const MongoChat: Model<ChatType> =
-  models[chatCollectionName] || model(chatCollectionName, ChatSchema);
-MongoChat.syncIndexes();
+export const MongoChat = getMongoModel<ChatType>(chatCollectionName, ChatSchema);

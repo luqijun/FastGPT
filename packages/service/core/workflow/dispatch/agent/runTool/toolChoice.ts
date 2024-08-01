@@ -1,6 +1,6 @@
 import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
 import { getAIApi } from '../../../../ai/config';
-import { filterGPTMessageByMaxTokens } from '../../../../chat/utils';
+import { filterGPTMessageByMaxTokens, loadRequestMessages } from '../../../../chat/utils';
 import {
   ChatCompletion,
   ChatCompletionMessageToolCall,
@@ -99,6 +99,8 @@ export const runToolWithToolChoice = async (
     }
     return item;
   });
+  const requestMessages = await loadRequestMessages(formativeMessages);
+
   // console.log(
   //   JSON.stringify(
   //     {
@@ -106,7 +108,7 @@ export const runToolWithToolChoice = async (
   //       model: toolModel.model,
   //       temperature: 0,
   //       stream,
-  //       messages: formativeMessages,
+  //       messages: requestMessages,
   //       tools,
   //       tool_choice: 'auto'
   //     },
@@ -124,7 +126,7 @@ export const runToolWithToolChoice = async (
       model: toolModel.model,
       temperature: 0,
       stream,
-      messages: formativeMessages,
+      messages: requestMessages,
       tools,
       tool_choice: 'auto'
     },
@@ -354,7 +356,7 @@ async function streamResponse({
     }
 
     const responseChoice = part.choices?.[0]?.delta;
-    // console.log(JSON.stringify(responseChoice, null, 2));
+
     if (responseChoice?.content) {
       const content = responseChoice.content || '';
       textAnswer += content;
@@ -369,7 +371,7 @@ async function streamResponse({
     } else if (responseChoice?.tool_calls?.[0]) {
       const toolCall: ChatCompletionMessageToolCall = responseChoice.tool_calls[0];
 
-      // 流响应中,每次只会返回一个工具. 如果带了 id，说明是执行一个工具
+      // In a stream response, only one tool is returned at a time.  If have id, description is executing a tool
       if (toolCall.id) {
         const toolNode = toolNodes.find((item) => item.nodeId === toolCall.function?.name);
 
@@ -377,33 +379,47 @@ async function streamResponse({
           if (toolCall.function?.arguments === undefined) {
             toolCall.function.arguments = '';
           }
-          toolCalls.push({
-            ...toolCall,
-            toolName: toolNode.name,
-            toolAvatar: toolNode.avatar
-          });
 
-          if (detail) {
-            responseWrite({
-              write,
-              event: SseResponseEventEnum.toolCall,
-              data: JSON.stringify({
-                tool: {
-                  id: toolCall.id,
-                  toolName: toolNode.name,
-                  toolAvatar: toolNode.avatar,
-                  functionName: toolCall.function.name,
-                  params: toolCall.function.arguments,
-                  response: ''
-                }
-              })
+          // Get last tool call
+          const lastToolCall = toolCalls[toolCalls.length - 1];
+
+          // new tool
+          if (lastToolCall?.id !== toolCall.id) {
+            toolCalls.push({
+              ...toolCall,
+              toolName: toolNode.name,
+              toolAvatar: toolNode.avatar
             });
+
+            if (detail) {
+              responseWrite({
+                write,
+                event: SseResponseEventEnum.toolCall,
+                data: JSON.stringify({
+                  tool: {
+                    id: toolCall.id,
+                    toolName: toolNode.name,
+                    toolAvatar: toolNode.avatar,
+                    functionName: toolCall.function.name,
+                    params: toolCall.function.arguments,
+                    response: ''
+                  }
+                })
+              });
+            }
+
+            continue;
           }
+          // last tool, update params
+        } else {
+          continue;
         }
       }
+
       /* arg 插入最后一个工具的参数里 */
-      const arg: string = responseChoice.tool_calls?.[0]?.function?.arguments;
+      const arg: string = toolCall?.function?.arguments;
       const currentTool = toolCalls[toolCalls.length - 1];
+
       if (currentTool) {
         currentTool.function.arguments += arg;
 

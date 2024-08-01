@@ -1,6 +1,6 @@
 import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
 import { getAIApi } from '../../../../ai/config';
-import { filterGPTMessageByMaxTokens } from '../../../../chat/utils';
+import { filterGPTMessageByMaxTokens, loadRequestMessages } from '../../../../chat/utils';
 import {
   ChatCompletion,
   StreamChatType,
@@ -88,6 +88,7 @@ export const runToolWithFunctionCall = async (
     }
     return item;
   });
+  const requestMessages = await loadRequestMessages(formativeMessages);
 
   /* Run llm */
   const ai = getAIApi({
@@ -99,7 +100,7 @@ export const runToolWithFunctionCall = async (
       model: toolModel.model,
       temperature: 0,
       stream,
-      messages: formativeMessages,
+      messages: requestMessages,
       functions,
       function_call: 'auto'
     },
@@ -385,7 +386,10 @@ async function streamResponse({
             });
           }
         }
+
+        continue;
       }
+
       /* arg 插入最后一个工具的参数里 */
       const arg: string = functionCall?.arguments || '';
       const currentTool = functionCalls[functionCalls.length - 1];

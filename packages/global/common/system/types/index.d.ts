@@ -31,11 +31,13 @@ export type FastGPTFeConfigsType = {
   show_openai_account?: boolean;
   show_promotion?: boolean;
   show_team_chat?: boolean;
-  hide_app_flow?: boolean;
   concatMd?: string;
+
   docUrl?: string;
   chatbotUrl?: string;
   openAPIDocUrl?: string;
+  systemPluginCourseUrl?: string;
+
   systemTitle?: string;
   systemDescription?: string;
   googleClientVerKey?: string;
@@ -66,12 +68,8 @@ export type SystemEnvType = {
   vectorMaxProcess: number;
   qaMaxProcess: number;
   pgHNSWEfSearch: number;
+  tokenWorkers: number; // token count max worker
+
   oneapiUrl?: string;
   chatApiKey?: string;
 };
-
-// declare global {
-//   var feConfigs: FastGPTFeConfigsType;
-//   var systemEnv: SystemEnvType;
-//   var systemInitd: boolean;
-// }

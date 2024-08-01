@@ -5,13 +5,14 @@ import Editor from './Editor';
 import MyModal from '../../MyModal';
 import { useTranslation } from 'next-i18next';
 import { EditorState, type LexicalEditor } from 'lexical';
-import { EditorVariablePickerType } from './type.d';
-import { useCallback, useTransition } from 'react';
+import { EditorVariableLabelPickerType, EditorVariablePickerType } from './type.d';
+import { useCallback } from 'react';
 
 const PromptEditor = ({
   showOpenModal = true,
   showResize = true,
   variables = [],
+  variableLabels = [],
   value,
   onChange,
   onBlur,
@@ -24,6 +25,7 @@ const PromptEditor = ({
   showOpenModal?: boolean;
   showResize?: boolean;
   variables?: EditorVariablePickerType[];
+  variableLabels?: EditorVariableLabelPickerType[];
   value?: string;
   onChange?: (text: string) => void;
   onBlur?: (text: string) => void;
@@ -34,7 +36,6 @@ const PromptEditor = ({
   isFlow?: boolean;
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [, startSts] = useTransition();
   const { t } = useTranslation();
 
   const onChangeInput = useCallback((editorState: EditorState, editor: LexicalEditor) => {
@@ -42,10 +43,8 @@ const PromptEditor = ({
     onChange?.(text);
   }, []);
   const onBlurInput = useCallback((editor: LexicalEditor) => {
-    startSts(() => {
-      const text = editorStateToText(editor).replaceAll('}}{{', '}} {{');
-      onBlur?.(text);
-    });
+    const text = editorStateToText(editor).replaceAll('}}{{', '}} {{');
+    onBlur?.(text);
   }, []);
 
   return (
@@ -55,6 +54,7 @@ const PromptEditor = ({
         showOpenModal={showOpenModal}
         onOpenModal={onOpen}
         variables={variables}
+        variableLabels={variableLabels}
         h={h}
         maxLength={maxLength}
         value={value}
@@ -71,6 +71,7 @@ const PromptEditor = ({
             showResize
             showOpenModal={false}
             variables={variables}
+            variableLabels={variableLabels}
             value={value}
             onChange={onChangeInput}
             onBlur={onBlurInput}
@@ -78,8 +79,8 @@ const PromptEditor = ({
           />
         </ModalBody>
         <ModalFooter>
-          <Button mr={2} onClick={onClose}>
-            {t('common.Confirm')}
+          <Button mr={2} onClick={onClose} px={6}>
+            {t('common:common.Confirm')}
           </Button>
         </ModalFooter>
       </MyModal>

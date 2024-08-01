@@ -1,5 +1,5 @@
 import { FlowNodeOutputTypeEnum, FlowNodeTypeEnum } from '../../node/constant';
-import { FlowNodeTemplateType } from '../../type/index.d';
+import { FlowNodeTemplateType } from '../../type/node.d';
 import {
   WorkflowIOValueTypeEnum,
   NodeOutputKeyEnum,
@@ -14,11 +14,12 @@ export const WorkflowStart: FlowNodeTemplateType = {
   flowNodeType: FlowNodeTypeEnum.workflowStart,
   sourceHandle: getHandleConfig(false, true, false, false),
   targetHandle: getHandleConfig(false, false, false, false),
-  avatar: '/imgs/workflow/userChatInput.svg',
+  avatar: 'core/workflow/template/workflowStart',
   name: '流程开始',
   intro: '',
   forbidDelete: true,
   unique: true,
+  version: '481',
   inputs: [{ ...Input_Template_UserChatInput, toolDescription: '用户问题' }],
   outputs: [
     {
@@ -30,3 +31,6 @@ export const WorkflowStart: FlowNodeTemplateType = {
     }
   ]
 };
+
+export const isWorkflowStartOutput = (key?: string) =>
+  !!WorkflowStart.outputs.find((output) => output.key === key);

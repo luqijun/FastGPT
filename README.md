@@ -52,11 +52,10 @@ https://github.com/labring/FastGPT/assets/15308462/7d3a38df-eb0e-4388-9250-2409b
 `1` 应用编排能力
    - [x] 提供简易模式，无需操作编排
    - [x] 工作流编排
-   - [x] 源文件引用追踪
-   - [x] 模块封装，实现多级复用
-   - [x] Tool 模块
-   - [ ] 嵌入 [Laf](https://github.com/labring/laf)，实现在线编写 HTTP 模块。初版已完成。
-   - [ ] 插件封装功能，支持低代码渲染
+   - [x] 工具调用
+   - [x] 插件 - 工作流封装能力
+   - [x] Code sandbox
+   - [ ] 循环调用
 
 `2` 知识库能力
    - [x] 多库复用，混用
@@ -66,15 +65,14 @@ https://github.com/labring/FastGPT/assets/15308462/7d3a38df-eb0e-4388-9250-2409b
    - [x] 支持 txt，md，html，pdf，docx，pptx，csv，xlsx (有需要更多可 PR file loader)
    - [x] 支持 url 读取、CSV 批量导入
    - [x] 混合检索 & 重排
-   - [ ] 支持文件阅读器
-   - [ ] 更多的数据预处理方案
+   - [ ] 标签过滤
   
 `3` 应用调试能力
    - [x] 知识库单点搜索测试
    - [x] 对话时反馈引用并可修改与删除
    - [x] 完整上下文呈现
    - [x] 完整模块中间值呈现
-   - [ ] 高级编排 DeBug 模式
+   - [x] 高级编排 DeBug 模式
   
 `4` OpenAPI 接口
    - [x] completions 接口 (chat 模式对齐 GPT 接口)
@@ -89,6 +87,8 @@ https://github.com/labring/FastGPT/assets/15308462/7d3a38df-eb0e-4388-9250-2409b
    
 `6` 其他
    - [x] 支持语音输入和输出 (可配置语音输入语音回答)
+   - [x] 模糊输入提示
+   - [ ] 模板市场
 
 <a href="#readme">
     <img src="https://img.shields.io/badge/-返回顶部-7d09f1.svg" alt="#" align="right">
@@ -106,7 +106,7 @@ https://github.com/labring/FastGPT/assets/15308462/7d3a38df-eb0e-4388-9250-2409b
 
   由于需要部署数据库，部署完后需要等待 2~4 分钟才能正常访问。默认用了最低配置，首次访问时会有些慢。相关使用教程可查看：[Sealos 部署 FastGPT](https://doc.fastgpt.in/docs/development/sealos/)
 
-* [快开始本地开发](https://doc.fastgpt.in/docs/development/intro/)
+* [快速开始本地开发](https://doc.fastgpt.in/docs/development/intro/)
 * [部署 FastGPT](https://doc.fastgpt.in/docs/development/sealos)
 * [系统配置文件说明](https://doc.fastgpt.in/docs/development/configuration/)
 * [多模型配置](https://doc.fastgpt.in/docs/development/one-api/)
@@ -120,9 +120,9 @@ https://github.com/labring/FastGPT/assets/15308462/7d3a38df-eb0e-4388-9250-2409b
 
 ## 🏘️ 社区交流群
 
-wx 扫一下加入：
+扫码加入飞书话题群 (新开，逐渐弃用微信群)：
 
-![](https://oss.laf.run/htr4n1-images/fastgpt-qr-code.jpg)
+![](https://oss.laf.run/otnvvf-imgs/1719505774252.jpg)
 
 <a href="#readme">
     <img src="https://img.shields.io/badge/-返回顶部-7d09f1.svg" alt="#" align="right">

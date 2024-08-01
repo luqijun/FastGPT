@@ -6,67 +6,41 @@ import {
 } from '@fastgpt/global/core/ai/type';
 import { chats2GPTMessages } from '@fastgpt/global/core/chat/adapt';
 import { ChatItemType } from '@fastgpt/global/core/chat/type';
-import { WorkerNameEnum, getWorker } from '../../../worker/utils';
+import { WorkerNameEnum, getWorkerController } from '../../../worker/utils';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
-import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { addLog } from '../../system/log';
 
-export const getTiktokenWorker = () => {
-  if (global.tiktokenWorker) {
-    return global.tiktokenWorker;
-  }
-
-  const worker = getWorker(WorkerNameEnum.countGptMessagesTokens);
-
-  worker.on('message', ({ id, data }: { id: string; data: number }) => {
-    const callback = global.tiktokenWorker?.callbackMap?.[id];
-
-    if (callback) {
-      callback?.(data);
-      delete global.tiktokenWorker.callbackMap[id];
-    }
-  });
-
-  global.tiktokenWorker = {
-    worker,
-    callbackMap: {}
-  };
-
-  return global.tiktokenWorker;
-};
-
-export const countGptMessagesTokens = (
+export const countGptMessagesTokens = async (
   messages: ChatCompletionMessageParam[],
   tools?: ChatCompletionTool[],
   functionCall?: ChatCompletionCreateParams.Function[]
 ) => {
-  return new Promise<number>((resolve) => {
-    const start = Date.now();
-
-    const { worker, callbackMap } = getTiktokenWorker();
-    const id = getNanoid();
-
-    const timer = setTimeout(() => {
-      resolve(0);
-      delete callbackMap[id];
-    }, 300);
-
-    callbackMap[id] = (data) => {
-      resolve(data);
-      clearTimeout(timer);
-
-      // 检测是否有内存泄漏
-      addLog.info(`Count token time: ${Date.now() - start}, token: ${data}`);
-      console.log(Object.keys(global.tiktokenWorker.callbackMap));
-    };
-
-    worker.postMessage({
-      id,
-      messages,
-      tools,
-      functionCall
+  try {
+    const workerController = getWorkerController<
+      {
+        messages: ChatCompletionMessageParam[];
+        tools?: ChatCompletionTool[];
+        functionCall?: ChatCompletionCreateParams.Function[];
+      },
+      number
+    >({
+      name: WorkerNameEnum.countGptMessagesTokens,
+      maxReservedThreads: global.systemEnv?.tokenWorkers || 20
     });
-  });
+
+    const total = await workerController.run({ messages, tools, functionCall });
+
+    return total;
+  } catch (error) {
+    addLog.error('Count token error', error);
+    const total = messages.reduce((sum, item) => {
+      if (item.content) {
+        return sum + item.content.length * 0.5;
+      }
+      return sum;
+    }, 0);
+    return total;
+  }
 };
 
 export const countMessagesTokens = (messages: ChatItemType[]) => {

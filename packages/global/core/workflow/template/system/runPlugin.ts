@@ -1,11 +1,11 @@
 import { FlowNodeTemplateTypeEnum } from '../../constants';
 import { FlowNodeTypeEnum } from '../../node/constant';
-import { FlowNodeTemplateType } from '../../type';
+import { FlowNodeTemplateType } from '../../type/node';
 import { getHandleConfig } from '../utils';
 
 export const RunPluginModule: FlowNodeTemplateType = {
   id: FlowNodeTypeEnum.pluginModule,
-  templateType: FlowNodeTemplateTypeEnum.externalCall,
+  templateType: FlowNodeTemplateTypeEnum.other,
   flowNodeType: FlowNodeTypeEnum.pluginModule,
   sourceHandle: getHandleConfig(true, true, true, true),
   targetHandle: getHandleConfig(true, true, true, true),
@@ -13,6 +13,7 @@ export const RunPluginModule: FlowNodeTemplateType = {
   name: '',
   showStatus: false,
   isTool: true,
+  version: '481',
   inputs: [], // [{key:'pluginId'},...]
   outputs: []
 };

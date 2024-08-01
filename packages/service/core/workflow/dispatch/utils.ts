@@ -1,14 +1,11 @@
+import { getErrText } from '@fastgpt/global/common/error/utils';
+import { ChatRoleEnum } from '@fastgpt/global/core/chat/constants';
 import type { ChatItemType } from '@fastgpt/global/core/chat/type.d';
 import {
   WorkflowIOValueTypeEnum,
   NodeOutputKeyEnum
 } from '@fastgpt/global/core/workflow/constants';
-import { FlowNodeTypeEnum } from '@fastgpt/global/core/workflow/node/constant';
-import {
-  RuntimeEdgeItemType,
-  RuntimeNodeItemType
-} from '@fastgpt/global/core/workflow/runtime/type';
-import { StoreNodeItemType } from '@fastgpt/global/core/workflow/type/index.d';
+import { RuntimeEdgeItemType } from '@fastgpt/global/core/workflow/runtime/type';
 
 export const filterToolNodeIdByEdges = ({
   nodeId,
@@ -47,10 +44,16 @@ export const filterToolNodeIdByEdges = ({
 
 export const getHistories = (history?: ChatItemType[] | number, histories: ChatItemType[] = []) => {
   if (!history) return [];
-  if (typeof history === 'number') return histories.slice(-(history * 2));
-  if (Array.isArray(history)) return history;
 
-  return [];
+  const systemHistories = histories.filter((item) => item.obj === ChatRoleEnum.System);
+
+  const filterHistories = (() => {
+    if (typeof history === 'number') return histories.slice(-(history * 2));
+    if (Array.isArray(history)) return history;
+    return [];
+  })();
+
+  return [...systemHistories, ...filterHistories];
 };
 
 /* value type format */
@@ -62,7 +65,10 @@ export const valueTypeFormat = (value: any, type?: WorkflowIOValueTypeEnum) => {
     return JSON.stringify(value);
   }
   if (type === 'number') return Number(value);
-  if (type === 'boolean') return Boolean(value);
+  if (type === 'boolean') {
+    if (typeof value === 'string') return value === 'true';
+    return Boolean(value);
+  }
   try {
     if (type === WorkflowIOValueTypeEnum.datasetQuote && !Array.isArray(value)) {
       return JSON.parse(value);
@@ -75,4 +81,27 @@ export const valueTypeFormat = (value: any, type?: WorkflowIOValueTypeEnum) => {
   }
 
   return value;
+};
+
+/* remove system variable */
+export const removeSystemVariable = (variables: Record<string, any>) => {
+  const copyVariables = { ...variables };
+  delete copyVariables.appId;
+  delete copyVariables.chatId;
+  delete copyVariables.responseChatItemId;
+  delete copyVariables.histories;
+  delete copyVariables.cTime;
+
+  return copyVariables;
+};
+
+export const formatHttpError = (error: any) => {
+  return {
+    message: getErrText(error),
+    data: error?.response?.data,
+    name: error?.name,
+    method: error?.config?.method,
+    code: error?.code,
+    status: error?.status
+  };
 };

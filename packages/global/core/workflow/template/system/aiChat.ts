@@ -3,7 +3,7 @@ import {
   FlowNodeOutputTypeEnum,
   FlowNodeTypeEnum
 } from '../../node/constant';
-import { FlowNodeTemplateType } from '../../type';
+import { FlowNodeTemplateType } from '../../type/node';
 import {
   WorkflowIOValueTypeEnum,
   NodeInputKeyEnum,
@@ -22,15 +22,16 @@ import { getHandleConfig } from '../utils';
 
 export const AiChatModule: FlowNodeTemplateType = {
   id: FlowNodeTypeEnum.chatNode,
-  templateType: FlowNodeTemplateTypeEnum.textAnswer,
+  templateType: FlowNodeTemplateTypeEnum.ai,
   flowNodeType: FlowNodeTypeEnum.chatNode,
   sourceHandle: getHandleConfig(true, true, true, true),
   targetHandle: getHandleConfig(true, true, true, true),
-  avatar: '/imgs/workflow/AI.png',
+  avatar: 'core/workflow/template/aiChat',
   name: 'AI 对话',
   intro: 'AI 大模型对话',
   showStatus: true,
   isTool: true,
+  version: '481',
   inputs: [
     Input_Template_SettingAiModel,
     // --- settings modal
@@ -88,6 +89,7 @@ export const AiChatModule: FlowNodeTemplateType = {
     {
       id: NodeOutputKeyEnum.history,
       key: NodeOutputKeyEnum.history,
+      required: true,
       label: 'core.module.output.label.New context',
       description: 'core.module.output.description.New context',
       valueType: WorkflowIOValueTypeEnum.chatHistory,
@@ -96,6 +98,7 @@ export const AiChatModule: FlowNodeTemplateType = {
     {
       id: NodeOutputKeyEnum.answerText,
       key: NodeOutputKeyEnum.answerText,
+      required: true,
       label: 'core.module.output.label.Ai response content',
       description: 'core.module.output.description.Ai response content',
       valueType: WorkflowIOValueTypeEnum.string,

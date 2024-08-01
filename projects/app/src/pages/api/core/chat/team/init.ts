@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { getGuideModule } from '@fastgpt/global/core/workflow/utils';
+import { getGuideModule, getAppChatConfig } from '@fastgpt/global/core/workflow/utils';
 import { getChatModelNameListByModules } from '@/service/core/app/workflow';
 import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import type { InitChatResponse, InitTeamChatProps } from '@/global/core/chat/api.d';
@@ -15,6 +15,8 @@ import { ChatErrEnum } from '@fastgpt/global/common/error/code/chat';
 import { filterPublicNodeResponseData } from '@fastgpt/global/core/chat/utils';
 import { ChatRoleEnum } from '@fastgpt/global/core/chat/constants';
 import { getAppLatestVersion } from '@fastgpt/service/core/app/controller';
+import { FlowNodeTypeEnum } from '@fastgpt/global/core/workflow/node/constant';
+import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -47,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // get app and history
-    const [{ history }, { nodes }] = await Promise.all([
+    const [{ histories }, { nodes }] = await Promise.all([
       getChatItems({
         appId,
         chatId,
@@ -58,11 +60,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]);
 
     // pick share response field
-    history.forEach((item) => {
-      if (item.obj === ChatRoleEnum.AI) {
-        item.responseData = filterPublicNodeResponseData({ flowResponses: item.responseData });
-      }
-    });
+    app.type !== AppTypeEnum.plugin &&
+      histories.forEach((item) => {
+        if (item.obj === ChatRoleEnum.AI) {
+          item.responseData = filterPublicNodeResponseData({ flowResponses: item.responseData });
+        }
+      });
 
     jsonRes<InitChatResponse>(res, {
       data: {
@@ -71,13 +74,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         title: chat?.title || '新对话',
         userAvatar: team?.avatar,
         variables: chat?.variables || {},
-        history,
+        history: histories,
         app: {
-          userGuideModule: getGuideModule(nodes),
+          chatConfig: getAppChatConfig({
+            chatConfig: app.chatConfig,
+            systemConfigNode: getGuideModule(nodes),
+            storeVariables: chat?.variableList,
+            storeWelcomeText: chat?.welcomeText,
+            isPublicFetch: false
+          }),
           chatModels: getChatModelNameListByModules(nodes),
           name: app.name,
           avatar: app.avatar,
-          intro: app.intro
+          intro: app.intro,
+          type: app.type,
+          pluginInputs:
+            app?.modules?.find((node) => node.flowNodeType === FlowNodeTypeEnum.pluginInput)
+              ?.inputs ?? []
         }
       }
     });

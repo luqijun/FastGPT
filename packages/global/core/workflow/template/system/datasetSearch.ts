@@ -3,7 +3,7 @@ import {
   FlowNodeOutputTypeEnum,
   FlowNodeTypeEnum
 } from '../../node/constant';
-import { FlowNodeTemplateType } from '../../type';
+import { FlowNodeTemplateType } from '../../type/node';
 import {
   WorkflowIOValueTypeEnum,
   NodeInputKeyEnum,
@@ -19,15 +19,16 @@ export const Dataset_SEARCH_DESC =
 
 export const DatasetSearchModule: FlowNodeTemplateType = {
   id: FlowNodeTypeEnum.datasetSearchNode,
-  templateType: FlowNodeTemplateTypeEnum.functionCall,
+  templateType: FlowNodeTemplateTypeEnum.ai,
   flowNodeType: FlowNodeTypeEnum.datasetSearchNode,
   sourceHandle: getHandleConfig(true, true, true, true),
   targetHandle: getHandleConfig(true, true, true, true),
-  avatar: '/imgs/workflow/db.png',
+  avatar: 'core/workflow/template/datasetSearch',
   name: '知识库搜索',
   intro: Dataset_SEARCH_DESC,
   showStatus: true,
   isTool: true,
+  version: '481',
   inputs: [
     {
       key: NodeInputKeyEnum.datasetSelectList,
@@ -35,7 +36,6 @@ export const DatasetSearchModule: FlowNodeTemplateType = {
       label: 'core.module.input.label.Select dataset',
       value: [],
       valueType: WorkflowIOValueTypeEnum.selectDataset,
-      list: [],
       required: true
     },
     {
