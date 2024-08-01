@@ -5,11 +5,29 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome",
+            "name": "Next.js: debug server-side",
+            "type": "node-terminal",
             "request": "launch",
+            "command": "npm run dev",
+            "cwd": "${workspaceFolder}/projects/app",
+        },
+        {
+            "name": "Next.js: debug client-side",
             "type": "chrome",
-            "url": "http://localhost:2999",
-            "webRoot": "${workspaceFolder}/projects/app"
+            "request": "launch",
+            "url": "http://localhost:2999"
+        },
+        {
+            "name": "Next.js: debug full stack",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev",
+            "serverReadyAction": {
+                "pattern": "- Local:.+(https?://.+)",
+                "uriFormat": "%s",
+                "action": "debugWithChrome"
+            },
+            "cwd": "${workspaceFolder}/projects/app",
         },
         {
             "command": "npm run dev",
@@ -18,5 +36,12 @@
             "type": "node-terminal",
             "cwd": "${workspaceFolder}/projects/app",
         }
+        // {
+        //     "name": "Launch Chrome",
+        //     "request": "launch",
+        //     "type": "chrome",
+        //     "url": "http://localhost:2999",
+        //     "webRoot": "${workspaceFolder}/projects/app"
+        // },
     ]
 }
