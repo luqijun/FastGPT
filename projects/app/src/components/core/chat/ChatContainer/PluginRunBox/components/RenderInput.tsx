@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Controller } from 'react-hook-form';
 import RenderPluginInput from './renderPluginInput';
 import { Button, Flex } from '@chakra-ui/react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 import { useContextSelector } from 'use-context-selector';
 import { PluginRunContext } from '../context';
 import { WorkflowIOValueTypeEnum } from '@fastgpt/global/core/workflow/constants';
@@ -31,10 +31,34 @@ const RenderInput = () => {
     );
   }, [pluginInputs]);
 
+  const historyFormValues = useMemo(() => {
+    if (histories.length === 0) return undefined;
+
+    try {
+      const inputValueString = histories[0].value[0].text?.content || '[]';
+      return JSON.parse(inputValueString).reduce(
+        (
+          acc: Record<string, any>,
+          {
+            key,
+            value
+          }: {
+            key: string;
+            value: any;
+          }
+        ) => ({ ...acc, [key]: value }),
+        {}
+      );
+    } catch (error) {
+      console.error('Failed to parse input value:', error);
+      return undefined;
+    }
+  }, [histories]);
+
   useEffect(() => {
     if (isEqual(getValues(), defaultFormValues)) return;
-    reset(defaultFormValues);
-  }, [defaultFormValues, histories]);
+    reset(historyFormValues || defaultFormValues);
+  }, [defaultFormValues, historyFormValues]);
 
   const isDisabledInput = histories.length > 0;
 

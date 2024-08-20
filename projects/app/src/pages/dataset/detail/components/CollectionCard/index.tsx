@@ -49,6 +49,8 @@ import {
   getTrainingTypeLabel
 } from '@fastgpt/global/core/dataset/collection/utils';
 import { useFolderDrag } from '@/components/common/folder/useFolderDrag';
+import TagsPopOver from './TagsPopOver';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 
 const Header = dynamic(() => import('./Header'));
 const EmptyCollectionTip = dynamic(() => import('./EmptyCollectionTip'));
@@ -60,6 +62,7 @@ const CollectionCard = () => {
   const { t } = useTranslation();
   const { datasetT } = useI18n();
   const { datasetDetail, loadDatasetDetail } = useContextSelector(DatasetPageContext, (v) => v);
+  const { feConfigs } = useSystemStore();
 
   const { openConfirm: openDeleteConfirm, ConfirmModal: ConfirmDeleteModal } = useConfirm({
     content: t('common:dataset.Confirm to delete the file'),
@@ -151,7 +154,7 @@ const CollectionCard = () => {
   useQuery(
     ['refreshCollection'],
     () => {
-      getData(1);
+      getData(pageNum);
       if (datasetDetail.status === DatasetStatusEnum.syncing) {
         loadDatasetDetail(datasetDetail._id);
       }
@@ -234,16 +237,19 @@ const CollectionCard = () => {
                 >
                   <Td minW={'150px'} maxW={['200px', '300px']} draggable py={2}>
                     <Flex alignItems={'center'}>
-                      <MyIcon name={collection.icon as any} w={'16px'} mr={2} />
+                      <MyIcon name={collection.icon as any} w={'18px'} mr={2} />
                       <MyTooltip
                         label={t('common:common.folder.Drag Tip')}
                         shouldWrapChildren={false}
                       >
-                        <Box color={'myGray.900'} className="textEllipsis">
+                        <Box color={'myGray.900'} fontWeight={'500'} className="textEllipsis">
                           {collection.name}
                         </Box>
                       </MyTooltip>
                     </Flex>
+                    {feConfigs?.isPlus && !!collection.tags?.length && (
+                      <TagsPopOver currentCollection={collection} />
+                    )}
                   </Td>
                   <Td py={2}>
                     {!checkCollectionIsFolder(collection.type) ? (

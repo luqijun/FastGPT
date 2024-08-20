@@ -34,7 +34,7 @@ import EmptyTip from '@fastgpt/web/components/common/EmptyTip';
 import { useFolderDrag } from '@/components/common/folder/useFolderDrag';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import { useI18n } from '@/web/context/I18n';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 function List() {
   const { setLoading } = useSystemStore();
@@ -154,7 +154,9 @@ function List() {
               label={
                 <Flex flexDirection={'column'} alignItems={'center'}>
                   <Box fontSize={'xs'} color={'myGray.500'}>
-                    {dataset.type === DatasetTypeEnum.folder ? '打开文件夹' : '打开知识库'}
+                    {dataset.type === DatasetTypeEnum.folder
+                      ? t('common.folder.Open folder')
+                      : t('common.folder.open_dataset')}
                   </Box>
                 </Flex>
               }

@@ -25,6 +25,8 @@ import { VariableUpdateNode } from './system/variableUpdate';
 import { CodeNode } from './system/sandbox';
 import { TextEditorNode } from './system/textEditor';
 import { CustomFeedbackNode } from './system/customFeedback';
+import { ReadFilesNodes } from './system/readFiles';
+import { UserSelectNode } from './system/userSelect/index';
 
 const systemNodes: FlowNodeTemplateType[] = [
   AiChatModule,
@@ -36,6 +38,7 @@ const systemNodes: FlowNodeTemplateType[] = [
   StopToolNode,
   ClassifyQuestionModule,
   ContextExtractModule,
+  ReadFilesNodes,
   HttpNode468,
   AiQueryExtension,
   LafModule,
@@ -49,7 +52,8 @@ export const appSystemModuleTemplates: FlowNodeTemplateType[] = [
   SystemConfigNode,
   WorkflowStart,
   ...systemNodes,
-  CustomFeedbackNode
+  CustomFeedbackNode,
+  UserSelectNode
 ];
 /* plugin flow module templates */
 export const pluginSystemModuleTemplates: FlowNodeTemplateType[] = [
